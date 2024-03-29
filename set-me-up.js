@@ -46,29 +46,9 @@ exec("ipconfig getifaddr en0", (error, stdout, stderr) => {
 
       let updatedData = data;
 
-      updatedData = updatedData.replace(
-        /(config\s*=\s*{[\s\S]*?baseUrl:\s*')([^']*)(')/,
-        (match, p1, p2, p3) => {
-          const baseUrl = `http://${localIpAddress}:9080`;
-          return p1 + baseUrl + p3;
-        }
-      );
-
-      updatedData = updatedData.replace(
-        /(config\s*=\s*{[\s\S]*?accountsBaseUrl:\s*')([^']*)(')/,
-        (match, p1, p2, p3) => {
-          const accountsBaseUrl = `http://${localIpAddress}:9082`;
-          return p1 + accountsBaseUrl + p3;
-        }
-      );
-
-      updatedData = updatedData.replace(
-        /(config\s*=\s*{[\s\S]*?apiBaseUrl:\s*')([^']*)(')/,
-        (match, p1, p2, p3) => {
-          const apiBaseUrl = `http://${localIpAddress}:9081`;
-          return p1 + apiBaseUrl + p3;
-        }
-      );
+      updatedData = updateUrlField('baseUrl', 9080, updatedData, localIpAddress);
+      updatedData = updateUrlField('accountsBaseUrl', 9082, updatedData, localIpAddress);
+      updatedData = updateUrlField('apiBaseUrl', 9081, updatedData, localIpAddress);
 
       fs.writeFile(configFile, updatedData, "utf8", (err) => {
         if (err) {
@@ -80,3 +60,17 @@ exec("ipconfig getifaddr en0", (error, stdout, stderr) => {
     });
   });
 });
+
+function updateUrlField(key, port, updatedData, localIpAddress) {
+    const regex = new RegExp(`(config\\s*=\\s*{[\\s\\S]*?${key}:\\s*')([^']*)(')`);
+    
+    updatedData = updatedData.replace(
+        regex,
+        (match, p1, p2, p3) => {
+            const baseUrl = `http://${localIpAddress}:${port}`;
+            return p1 + baseUrl + p3;
+        }
+    );
+    return updatedData;
+}
+
