@@ -35,8 +35,12 @@ exec("ipconfig getifaddr en0", (error, stdout, stderr) => {
       }
     });
 
-    const configFile =
-      "/Users/mpancaldi/AppetizeWorkspace/appetize-webserver/config.dev.js";
+    const configFile = process.env.CONFIG_FILE_PATH;
+
+    if (!configFile) {
+        console.error("Error reading the Config file");
+        return;
+    }
 
     fs.readFile(configFile, "utf8", (err, data) => {
       if (err) {

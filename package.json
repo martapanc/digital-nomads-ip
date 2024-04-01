@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "hostile": "^1.4.0"
+  },
+  "scripts": {
+    "setup": "node --env-file=.env set-me-up.js"
   }
 }
